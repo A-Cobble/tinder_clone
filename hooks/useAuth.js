@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import React, { createContext } from 'react'
+import React, { createContext, useContext } from 'react'
 
 const AuthContext = createContext({})
 
@@ -9,4 +9,8 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   )
+}
+
+export default function useAuth() {
+  return useContext(AuthContext)
 }
