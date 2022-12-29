@@ -48,6 +48,7 @@ const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
   const [request, response, promptAsync] = Google.useAuthRequest(
     {
       expoClientId: EXPO_CLIENT_ID,
@@ -59,11 +60,20 @@ export const AuthProvider = ({ children }) => {
   )
 
   useEffect(() => {
-        if(response?.type === "success"){
-          setAccessToken(response.authentication.accessToken)
-          //login...
-        }
-      },[response])
+    if(response?.type === "success"){
+      // console.log(response)
+      setAccessToken(response.authentication.accessToken)
+      //login...
+      fetch("https://www.googleapis.com/userinfo/v2/me", {
+        headers: { Authorization: `Bearer ${response.authentication.accessToken}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+        setUserInfo(data)
+      })
+    }
+  },[response])
 
   // const signInWithGoogle = () => {
   //   Google.useAuthRequest(config).then((logInResult) => {
@@ -76,8 +86,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider 
       value={{
-        user: null,
-        accessToken,
+        user: userInfo? userInfo : null,
         promptAsync
       }}
     >

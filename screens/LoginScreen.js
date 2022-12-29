@@ -3,11 +3,26 @@ import React from 'react'
 import useAuth from '../hooks/useAuth'
 
 const LoginScreen = () => {
-  const { accessToken, promptAsync } = useAuth();
+  const { promptAsync } = useAuth();
+  // const { accessToken, promptAsync, setUserInfo, userInfo } = useAuth();
+
+  // function getUserData() {
+  //   fetch("https://www.googleapis.com/userinfo/v2/me", {
+  //     headers: { Authorization: `Bearer ${accessToken}` }
+  //   })
+
+  //   .then(res => res.json())
+  //   .then(data => {
+  //     console.log(data)
+  //     setUserInfo(data)
+  //   })
+  // }
+
   return (
     <View>
       <Text>LoginScreen</Text>
-      <Button title="login" onPress={accessToken? getUserData : () => promptAsync({ useProxy: true, showInRecents: true })} />
+      {/* <Button title="login" onPress={accessToken? () => getUserData() : () => promptAsync({ useProxy: true, showInRecents: true })} /> */}
+      <Button title="login" onPress={() => promptAsync({ useProxy: true, showInRecents: true })} />
     </View>
   )
 }
