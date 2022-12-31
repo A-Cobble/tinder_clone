@@ -43,12 +43,15 @@ import { View, Text } from 'react-native'
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as Google from "expo-auth-session/providers/google";
 import { EXPO_CLIENT_ID, ANDROID_CLIENT_ID, IOS_CLIENT_ID } from "@env";
+import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signOut } from 'firebase/auth';
+import { auth } from "../firebase"
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState("");
   const [userInfo, setUserInfo] = useState(null);
+  // const [request, response, promptAsync] = Google.useAuthRequest(
   const [request, response, promptAsync] = Google.useAuthRequest(
     {
       expoClientId: EXPO_CLIENT_ID,
@@ -64,14 +67,17 @@ export const AuthProvider = ({ children }) => {
       // console.log(response)
       setAccessToken(response.authentication.accessToken)
       //login...
-      fetch("https://www.googleapis.com/userinfo/v2/me", {
-        headers: { Authorization: `Bearer ${response.authentication.accessToken}` }
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data)
-        setUserInfo(data)
-      })
+      console.log(response);
+      const credential = GoogleAuthProvider.credential(response.authentication.idToken, response.authentication.accessToken)
+      signInWithCredential(auth, credential)
+      // fetch("https://www.googleapis.com/userinfo/v2/me", {
+      //   headers: { Authorization: `Bearer ${response.authentication.accessToken}` }
+      // })
+      // .then(res => res.json())
+      // .then(data => {
+      //   // console.log(data)
+      //   setUserInfo(data)
+      // })
     }
   },[response])
 
