@@ -50,8 +50,10 @@ const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState("");
-  const [userInfo, setUserInfo] = useState(null);
-  // const [request, response, promptAsync] = Google.useAuthRequest(
+  const [user, setUser] = useState(null);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [request, response, promptAsync] = Google.useAuthRequest(
     {
       expoClientId: EXPO_CLIENT_ID,
@@ -63,9 +65,19 @@ export const AuthProvider = ({ children }) => {
   )
 
   useEffect(() => {
+     onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      }else {
+        //Not logged in...
+        setUser(null);
+      }
+      setLoadingInitial(false)
+    })
+  },[])
+
+  useEffect(() => {
     if(response?.type === "success"){
-      // console.log(response)
-      setAccessToken(response.authentication.accessToken)
       //login...
       console.log(response);
       const credential = GoogleAuthProvider.credential(response.authentication.idToken, response.authentication.accessToken)
@@ -79,24 +91,33 @@ export const AuthProvider = ({ children }) => {
       //   setUserInfo(data)
       // })
     }
+    setLoading(false)
   },[response])
 
-  // const signInWithGoogle = () => {
-  //   Google.useAuthRequest(config).then((logInResult) => {
-  //     if(logInResult?.type === "success"){
-  //       //login...
-  //     }
-  //   });
-  // }
+  const signInWithGoogle = async () => {
+    setLoading(true);
+    promptAsync();
+  };
+
+  const logout = () => {
+    setLoading(true);
+    signOut(auth)
+      .catch(error => setError(error))
+      .finally(() => setLoading(false))
+  }
 
   return (
     <AuthContext.Provider 
       value={{
-        user: userInfo? userInfo : null,
-        promptAsync
+        // user: userInfo? userInfo : null,
+        user,
+        loading,
+        error,
+        signInWithGoogle,
+        logout,
       }}
     >
-      {children}
+      {!loadingInitial && children}
     </AuthContext.Provider>
   )
 }

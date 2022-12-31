@@ -3,7 +3,8 @@ import React from 'react'
 import useAuth from '../hooks/useAuth'
 
 const LoginScreen = () => {
-  const { promptAsync } = useAuth();
+  // const { promptAsync } = useAuth();
+  const { signInWithGoogle } = useAuth();
   // const { accessToken, promptAsync, setUserInfo, userInfo } = useAuth();
 
   // function getUserData() {
@@ -22,7 +23,8 @@ const LoginScreen = () => {
     <View>
       <Text>LoginScreen</Text>
       {/* <Button title="login" onPress={accessToken? () => getUserData() : () => promptAsync({ useProxy: true, showInRecents: true })} /> */}
-      <Button title="login" onPress={() => promptAsync({ useProxy: true, showInRecents: true })} />
+      {/* <Button title="login" onPress={() => promptAsync({ useProxy: true, showInRecents: true })} /> */}
+      <Button title="login" onPress={() => signInWithGoogle()} />
     </View>
   )
 }
