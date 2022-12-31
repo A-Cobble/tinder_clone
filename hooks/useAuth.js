@@ -82,14 +82,6 @@ export const AuthProvider = ({ children }) => {
       console.log(response);
       const credential = GoogleAuthProvider.credential(response.authentication.idToken, response.authentication.accessToken)
       signInWithCredential(auth, credential)
-      // fetch("https://www.googleapis.com/userinfo/v2/me", {
-      //   headers: { Authorization: `Bearer ${response.authentication.accessToken}` }
-      // })
-      // .then(res => res.json())
-      // .then(data => {
-      //   // console.log(data)
-      //   setUserInfo(data)
-      // })
     }
     setLoading(false)
   },[response])
@@ -109,7 +101,6 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider 
       value={{
-        // user: userInfo? userInfo : null,
         user,
         loading,
         error,
