@@ -24,7 +24,7 @@ const HomeScreen = () => {
           <Image style={tw`h-10 w-10 rounded-full`} source={{ uri: user.photoURL}} />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Image style={tw`h-14 w-12`} source={require("../images/logo.png")} />
+          <Image style={tw`h-13.75 w-11.75`} source={require("../images/logo.png")} />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={()=> navigation.navigate("Chat")}/*style={tw`absolute right-5 top-3`}*/>
