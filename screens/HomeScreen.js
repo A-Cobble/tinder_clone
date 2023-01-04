@@ -1,5 +1,5 @@
 import { View, Text, Button, SafeAreaView, TouchableOpacity, Image, StyleSheet } from 'react-native'
-import React, { useLayoutEffect } from 'react'
+import React, { useLayoutEffect, useRef } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import useAuth from '../hooks/useAuth';
 import tw from "twrnc"
@@ -38,6 +38,7 @@ const DUMMY_DATA = [
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
+  const swipeRef = useRef(null)
   console.log(user)
   // useLayoutEffect(() => {
   //   navigation.setOptions({
@@ -53,8 +54,8 @@ const HomeScreen = () => {
         <TouchableOpacity onPress={logout} /*style={tw`absolute left-5 top-3`}*/>
           <Image style={tw`h-10 w-10 rounded-full`} source={{ uri: user.photoURL}} />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Image style={tw`h-13.75 w-11.75`} source={require("../images/logo.png")} />
+        <TouchableOpacity onPress={() => navigation.navigate("Modal")}>
+          <Image style={tw`h-12.5 w-10.6`} source={require("../images/logo.png")} />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={()=> navigation.navigate("Chat")}/*style={tw`absolute right-5 top-3`}*/>
@@ -66,17 +67,44 @@ const HomeScreen = () => {
       {/* Cards */}
       <View style={tw`flex-1 -mt-6`}>
         <Swiper 
+          ref={swipeRef}
           containerStyle={{ backgroundColor: "transparent" }}
           stackSize={5}
           cardIndex={0}
           animateCardOpacity
           verticalSwipe={false}
-          cards={DUMMY_DATA} 
+          cards={DUMMY_DATA}
+          overlayLabels={{
+            left: {
+              title: "NOPE",
+              style:{
+                label:{
+                  textAlign: "right",
+                  color: "red",
+                },
+              },
+            },
+            right: {
+              title: "MATCH",
+              style:{
+                label:{
+                  color: "#4DED30",
+                },
+              },
+            }
+          }} 
+          onSwipedLeft={() => {
+            console.log("Swipe REJECTED")
+          }}
+          onSwipedRight={() => {
+            console.log("Swipe MATCH")
+          }}
+          backgroundColor={"#4FD0E9"}
           renderCard={(card) => (
             <View key={card.id} style={tw `relative bg-white h-3/4 rounded-xl`}>
               <Image style={tw `absolute top-0 h-full w-full rounded-xl`} source={{ uri: card.photoURL}}/>
               
-              <View style={[tw `absolute bottom-0 flex-row justify-between items-between bg-white w-full h-20 px-6 py-2 rounded-b-xl`, styles.cardShadow]}>
+              <View style={[tw `absolute bottom-0 flex-row justify-between items-center bg-white w-full h-20 px-6 py-2 rounded-b-xl`, styles.cardShadow]}>
                 <View>
                   <Text style={tw `text-xl font-bold`}>
                     {card.firstName} {card.lastName}
@@ -95,7 +123,20 @@ const HomeScreen = () => {
         />
       </View>
 
-
+      <View style={tw `flex flex-row justify-evenly`}>
+          <TouchableOpacity
+            onPress={() => swipeRef.current.swipeLeft()}
+            style={tw `items-center justify-center rounded-full w-16 h-16 bg-red-200`}
+            >
+            <Entypo name="cross" size={24} color="red" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => swipeRef.current.swipeRight()}
+            style={tw `items-center justify-center rounded-full w-16 h-16 bg-green-200`}
+            >
+            <AntDesign name="heart" size={24} color="green" />
+          </TouchableOpacity>
+      </View>
 
 
       {/* <Text>{`Hello and welcome to the Tinder_Clone`}</Text>
