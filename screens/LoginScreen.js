@@ -37,7 +37,7 @@ const LoginScreen = () => {
       >
         <TouchableOpacity 
           style={[tw`absolute bottom-40 w-52 p-4 bg-white rounded-2xl`, { marginHorizontal: "25%"}]}
-          onPress={signInWithGoogle}
+          onPress={() => signInWithGoogle()}
         >
           <Text style={tw`font-semibold text-center`}>
             Sign in & get swiping

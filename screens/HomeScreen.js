@@ -39,7 +39,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
   const swipeRef = useRef(null)
-  console.log(user)
+  // console.log(user)
   // useLayoutEffect(() => {
   //   navigation.setOptions({
   //     headerShown: false,

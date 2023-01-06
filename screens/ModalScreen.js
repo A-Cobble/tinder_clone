@@ -2,7 +2,7 @@ import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
 import React, { useLayoutEffect, useState } from 'react';
 import tw from "twrnc";
 import useAuth from '../hooks/useAuth';
-import { NavigationHelpersContext, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { serverTimestamp, setDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -15,7 +15,8 @@ const ModalScreen = () => {
   const incompleteForm = !image || !job || !age;
 
   const updateUserProfile = () => {
-    setDoc(doc(db, 'users', user.uid), {
+    // console.log(user,"I am hereerererereree")
+    setDoc(doc(db, "users", user.uid), {
       id: user.uid,
       displayName: user.displayName,
       photoURL: image,
@@ -23,7 +24,7 @@ const ModalScreen = () => {
       age: age,
       timestamp: serverTimestamp()
     }).then(() => {
-      NavigationHelpersContext.navigation('Home');
+      navigation.navigate("Home");
     })
     .catch((error) => {
       alert(error.message);
@@ -49,7 +50,7 @@ const ModalScreen = () => {
         style={tw `text-center text-xl pb-2`} 
         placeholder="Enter a Profile Pic URL"
         value={image}
-        onChangeText={ text => setImage(text) }
+        onChangeText={setImage}
       />
 
 
@@ -60,7 +61,7 @@ const ModalScreen = () => {
         style={tw `text-center text-xl pb-2`} 
         placeholder="Enter your occupation"
         value={job}
-        onChangeText={ text => setJob(text) }
+        onChangeText={setJob}
       />
 
       <Text style={tw `text-center p-4 font-bold text-red-400`}>
@@ -72,7 +73,7 @@ const ModalScreen = () => {
         value={age}
         maxLength={2}
         keyboardType="numeric"
-        onChangeText={ text => setAge(text) }
+        onChangeText={setAge}
       />
 
       <TouchableOpacity 

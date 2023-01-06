@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }) => {
       expoClientId: EXPO_CLIENT_ID,
       androidClientId: ANDROID_CLIENT_ID,
       iosClientId: IOS_CLIENT_ID,
+      selectAccount : true,
       // scopes: ["profile", "email"],
       // permissions: ["public_profile", "email", "gender", "location"],
     }
