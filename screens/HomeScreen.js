@@ -1,10 +1,12 @@
 import { View, Text, Button, SafeAreaView, TouchableOpacity, Image, StyleSheet } from 'react-native'
-import React, { useLayoutEffect, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import useAuth from '../hooks/useAuth';
 import tw from "twrnc"
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
+import { collection, doc, getDocs, onSnapshot, query, setDoc, where } from 'firebase/firestore';
+import { db } from '../firebase';
 
 
 const DUMMY_DATA = [
@@ -38,6 +40,7 @@ const DUMMY_DATA = [
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
+  const [profiles, setProfiles] = useState([]);
   const swipeRef = useRef(null)
   // console.log(user)
   // useLayoutEffect(() => {
@@ -45,6 +48,56 @@ const HomeScreen = () => {
   //     headerShown: false,
   //   })
   // },[])
+  useLayoutEffect(() => 
+    onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
+      if(!snapshot.exists()) {
+        navigation.navigate("Modal")
+      }
+    }),
+  []);
+
+  useEffect(() => {
+    let unsub;
+
+    const fetchCards = async () => {
+      const passes = getDocs(collection(db, 'users', user.uid, 'nopes')).then(
+        (snapshot) => {return( snapshot.docs.map((doc) => doc.id))}
+      );
+      console.log([passes])
+      const passedUserIds = passes.length > 0 ? passes : ['test'];
+      console.log(passedUserIds)
+      unsub = onSnapshot(
+        query(
+          collection(db, "users"), 
+          where("id", "not-in", [...passedUserIds])
+        ), (snapshot) => {
+          setProfiles(
+            snapshot.docs
+              .filter((doc) => doc.id !== user.uid)
+              .map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }))
+          );
+        }
+      );
+    };
+
+    fetchCards();
+    return unsub;
+  },[]);
+
+  const swipeLeft = (cardIndex) => {
+    if (!profiles[cardIndex]) return;
+    const userSwiped = profiles[cardIndex];
+    console.log(`You swiped NOPE on ${userSwiped.displayName}`);
+
+    setDoc(doc(db, 'users', user.uid, 'nopes', userSwiped.id), userSwiped)
+  }
+
+  const swipeRight = () => {
+
+  }
 
   return (
     <SafeAreaView style={tw `flex-1`}>
@@ -73,7 +126,7 @@ const HomeScreen = () => {
           cardIndex={0}
           animateCardOpacity
           verticalSwipe={false}
-          cards={DUMMY_DATA}
+          cards={profiles}
           overlayLabels={{
             left: {
               title: "NOPE",
@@ -93,21 +146,23 @@ const HomeScreen = () => {
               },
             }
           }} 
-          onSwipedLeft={() => {
+          onSwipedLeft={(cardIndex) => {
             console.log("Swipe REJECTED")
+            swipeLeft(cardIndex);
           }}
-          onSwipedRight={() => {
+          onSwipedRight={(cardIndex) => {
             console.log("Swipe MATCH")
+            swipeRight(cardIndex)
           }}
           backgroundColor={"#4FD0E9"}
-          renderCard={(card) => (
+          renderCard={(card) => card? (
             <View key={card.id} style={tw `relative bg-white h-3/4 rounded-xl`}>
               <Image style={tw `absolute top-0 h-full w-full rounded-xl`} source={{ uri: card.photoURL}}/>
               
               <View style={[tw `absolute bottom-0 flex-row justify-between items-center bg-white w-full h-20 px-6 py-2 rounded-b-xl`, styles.cardShadow]}>
                 <View>
                   <Text style={tw `text-xl font-bold`}>
-                    {card.firstName} {card.lastName}
+                    {card.displayName}
                   </Text>
                   <Text>
                     {card.job}
@@ -118,6 +173,20 @@ const HomeScreen = () => {
                 </Text>
               </View>
             </View>
+            ) : (
+              <View
+                style={[tw `relative bg-white h-3/4 rounded-xl justify-center items-center`, styles.cardShadow]}
+                >
+                <Text style={tw `font-bold pb-5`}>
+                  No more profiles
+                </Text>
+                <Image
+                  style={tw `h-20 w-full`}
+                  height={100}
+                  width={100}
+                  source={{ uri: "https://links.papareact.com/6gb" }}
+                />
+              </View>
             )
           }
         />
