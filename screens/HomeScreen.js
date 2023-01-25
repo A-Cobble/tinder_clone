@@ -64,13 +64,15 @@ const HomeScreen = () => {
       //   (snapshot) => snapshot.docs.map((doc) => doc.id)
       // );
       const passes = (await getDocs(collection(db, 'users', user.uid, 'nopes'))).docs.map((doc) => doc.id)
+      const swipes = (await getDocs(collection(db, 'users', user.uid, 'swipes'))).docs.map((doc) => doc.id)
       // const passes = snapshots.docs.map((doc) => doc.id)
       const passedUserIds = passes.length > 0 ? passes : ['test'];
+      const swipedUserIds = swipes.length > 0 ? swipes : ['test'];
 
       unsub = onSnapshot(
         query(
           collection(db, "users"), 
-          where("id", "not-in", [...passedUserIds])
+          where("id", "not-in", [...passedUserIds, ...swipedUserIds])
         ), 
         (snapshot) => {
           setProfiles(
@@ -89,17 +91,25 @@ const HomeScreen = () => {
     return unsub;
   },[]);
 
+  // console.log(profiles)
+
   const swipeLeft = (cardIndex) => {
     if (!profiles[cardIndex]) return;
+
     const userSwiped = profiles[cardIndex];
     console.log(`You swiped NOPE on ${userSwiped.displayName}`);
 
     setDoc(doc(db, 'users', user.uid, 'nopes', userSwiped.id), userSwiped)
   }
 
-  const swipeRight = () => {
+  const swipeRight = (cardIndex) => {
+    if (!profiles[cardIndex]) return;
 
-  }
+    const userSwiped = profiles[cardIndex];
+    console.log(`You swiped MATCH on ${userSwiped.displayName} (${userSwiped.job})`);
+    
+    setDoc(doc(db, "users", user.uid, "swipes", userSwiped.id), userSwiped);
+  };
 
   return (
     <SafeAreaView style={tw `flex-1`}>
@@ -124,11 +134,11 @@ const HomeScreen = () => {
         <Swiper 
           ref={swipeRef}
           containerStyle={{ backgroundColor: "transparent" }}
+          cards={profiles}
           stackSize={5}
           cardIndex={0}
           animateCardOpacity
           verticalSwipe={false}
-          cards={profiles}
           overlayLabels={{
             left: {
               title: "NOPE",
@@ -149,18 +159,17 @@ const HomeScreen = () => {
             }
           }} 
           onSwipedLeft={(cardIndex) => {
-            console.log("Swipe REJECTED")
+            // console.log("Swipe REJECTED")
             swipeLeft(cardIndex);
           }}
           onSwipedRight={(cardIndex) => {
-            console.log("Swipe MATCH")
+            // console.log("Swipe MATCH")
             swipeRight(cardIndex)
           }}
           backgroundColor={"#4FD0E9"}
-          renderCard={(card) => card? (
+          renderCard={(card) => (card) ? (
             <View key={card.id} style={tw `relative bg-white h-3/4 rounded-xl`}>
               <Image style={tw `absolute top-0 h-full w-full rounded-xl`} source={{ uri: card.photoURL}}/>
-              
               <View style={[tw `absolute bottom-0 flex-row justify-between items-center bg-white w-full h-20 px-6 py-2 rounded-b-xl`, styles.cardShadow]}>
                 <View>
                   <Text style={tw `text-xl font-bold`}>
@@ -191,6 +200,9 @@ const HomeScreen = () => {
               </View>
             )
           }
+          onSwipedAll={() => {
+            swipeRef.current.swipeLeft()
+          }}
         />
       </View>
 
