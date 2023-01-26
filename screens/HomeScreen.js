@@ -42,12 +42,7 @@ const HomeScreen = () => {
   const { user, logout } = useAuth();
   const [profiles, setProfiles] = useState([]);
   const swipeRef = useRef(null)
-  // console.log(user)
-  // useLayoutEffect(() => {
-  //   navigation.setOptions({
-  //     headerShown: false,
-  //   })
-  // },[])
+
   useLayoutEffect(() => 
     onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
       if(!snapshot.exists()) {
@@ -90,8 +85,6 @@ const HomeScreen = () => {
     fetchCards();
     return unsub;
   },[db]);
-
-  // console.log(profiles)
 
   const swipeLeft = (cardIndex) => {
     if (!profiles[cardIndex]) return;
@@ -186,11 +179,9 @@ const HomeScreen = () => {
             }
           }} 
           onSwipedLeft={(cardIndex) => {
-            // console.log("Swipe REJECTED")
             swipeLeft(cardIndex);
           }}
           onSwipedRight={(cardIndex) => {
-            // console.log("Swipe MATCH")
             swipeRight(cardIndex)
           }}
           backgroundColor={"#4FD0E9"}

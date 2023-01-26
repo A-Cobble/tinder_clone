@@ -15,7 +15,6 @@ const ModalScreen = () => {
   const incompleteForm = !image || !job || !age;
 
   const updateUserProfile = () => {
-    // console.log(user,"I am hereerererereree")
     setDoc(doc(db, "users", user.uid), {
       id: user.uid,
       displayName: user.displayName,

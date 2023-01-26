@@ -80,7 +80,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if(response?.type === "success"){
       //login...
-      // console.log(response);
       const credential = GoogleAuthProvider.credential(response.authentication.idToken, response.authentication.accessToken)
       signInWithCredential(auth, credential)
     }
