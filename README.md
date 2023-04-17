@@ -38,7 +38,7 @@ Next, install the dependencies:
 ```bash
 npm install
 # or
-yarn install
+yarn add
 ```
 
 <br>
